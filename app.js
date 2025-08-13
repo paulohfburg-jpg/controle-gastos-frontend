@@ -78,7 +78,7 @@ async function apiPut(path, body){
 
 async function apiDelete(path){ 
     return fetch(`${API_BASE}${path}`, { method:'DELETE' }); 
-};
+}; 
 
 
 function showConfirmModal(message, callback) {
@@ -343,23 +343,28 @@ document.addEventListener('click', async (e)=>{ if(e.target.classList.contains('
 
 async function renderBoxesTable(){ const tbody=document.getElementById('boxes-table-body'); tbody.innerHTML=''; STATE.boxes.forEach(b=>{ const tr=document.createElement('tr'); tr.innerHTML=`<td class="px-6 py-4">${b.descricao}</td><td class="px-6 py-4">${b.origem_descricao || 'N/A'}</td><td class="px-6 py-4 text-right"><button data-id="${b.id}" class="edit-box-btn material-symbols-outlined edit-icon icon-button ">edit</button> <button data-id="${b.id}" class="delete-box-btn material-symbols-outlined delete-icon icon-button ">delete</button></td>`; tbody.appendChild(tr); }); }
 
-document.getElementById('box-form').addEventListener('submit', async (e)=>{
+document.getElementById('box-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const form = e.target;
-    const id=form['box-id'].value;
-    const descricao=form['box-description'].value;
-    const origemId=form['box-origin'].value;
-    const data={descricao, origemId};
-    
+    const id = form['box-id'].value;
+    const descricao = form['box-description'].value;
+    // CORREÇÃO: Converte o valor de origem_id para um número inteiro
+    const origemId = parseInt(form['box-origin'].value, 10);
+
+    const data = {
+        descricao: descricao,
+        origem_id: origemId
+    };
+
     let message;
-    if(id){
+    if (id) {
         await apiPut(`/api/caixas/${id}`, data);
         message = 'Caixa editada com sucesso!';
-    }else{
+    } else {
         await apiPost('/api/caixas', data);
         message = 'Caixa cadastrada com sucesso!';
     }
-    
+
     hideModal('box-form-modal');
     await reloadOriginsAndBoxes();
     showFeedback(message, 'box-feedback-message');
@@ -532,4 +537,3 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ... (O restante do seu código JavaScript, como os listeners de formulário)
 });
-
