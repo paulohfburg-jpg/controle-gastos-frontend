@@ -78,7 +78,7 @@ async function apiPut(path, body){
 
 async function apiDelete(path){ 
     return fetch(`${API_BASE}${path}`, { method:'DELETE' }); 
-}); }
+};
 
 
 function showConfirmModal(message, callback) {
@@ -532,3 +532,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ... (O restante do seu código JavaScript, como os listeners de formulário)
 });
+
