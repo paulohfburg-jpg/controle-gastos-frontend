@@ -78,13 +78,6 @@ const formatValueInput = (input) => {
 
 let STATE = { origins: [], boxes: [], balances: [], debts: [], currentMonth: new Date().getMonth()+1, currentYear: new Date().getFullYear(), selectedOriginFilter: 'all' };
 
-
-async function apiGet(path){ const res = await fetch(path); if(!res.ok) throw new Error(`GET ${path} failed: ${res.status}`); return res.json(); }
-async function apiPost(path, body){ return fetch(path, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(body) }); }
-async function apiPut(path, body){ return fetch(path, { method:'PUT', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(body) }); }
-async function apiDelete(path){ return fetch(path, { method:'DELETE' }); }
-
-
 function showConfirmModal(message, callback) {
     const modal = document.getElementById('confirm-modal');
     const confirmMessage = document.getElementById('confirm-message');
@@ -536,3 +529,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ... (O restante do seu código JavaScript, como os listeners de formulário)
 });
+
