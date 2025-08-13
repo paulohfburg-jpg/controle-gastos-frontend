@@ -1,30 +1,3 @@
-const API_BASE = "https://controle-gastos-backend-9rox.onrender.com";
-
-async function apiGet(path){ 
-    const res = await fetch(`${API_BASE}${path}`);
-    if(!res.ok) throw new Error(`GET ${path} failed: ${res.status}`); 
-    return res.json(); 
-}
-async function apiPost(path, body){ 
-    return fetch(`${API_BASE}${path}`, { 
-        method:'POST', 
-        headers:{ 'Content-Type':'application/json' }, 
-        body: JSON.stringify(body) 
-    }); 
-}
-async function apiPut(path, body){ 
-    return fetch(`${API_BASE}${path}`, { 
-        method:'PUT', 
-        headers:{ 'Content-Type':'application/json' }, 
-        body: JSON.stringify(body) 
-    }); 
-}
-async function apiDelete(path){ 
-    return fetch(`${API_BASE}${path}`, { method:'DELETE' }); 
-}
-
-
-
 function showFeedback(message, elementId) {
     const feedbackEl = document.getElementById(elementId);
     if (feedbackEl) {
@@ -77,6 +50,13 @@ const formatValueInput = (input) => {
 };
 
 let STATE = { origins: [], boxes: [], balances: [], debts: [], currentMonth: new Date().getMonth()+1, currentYear: new Date().getFullYear(), selectedOriginFilter: 'all' };
+
+
+async function apiGet(path){ const res = await fetch(path); if(!res.ok) throw new Error(`GET ${path} failed: ${res.status}`); return res.json(); }
+async function apiPost(path, body){ return fetch(path, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(body) }); }
+async function apiPut(path, body){ return fetch(path, { method:'PUT', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(body) }); }
+async function apiDelete(path){ return fetch(path, { method:'DELETE' }); }
+
 
 function showConfirmModal(message, callback) {
     const modal = document.getElementById('confirm-modal');
@@ -529,4 +509,3 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ... (O restante do seu código JavaScript, como os listeners de formulário)
 });
-
