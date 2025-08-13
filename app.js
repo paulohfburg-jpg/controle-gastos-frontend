@@ -52,10 +52,33 @@ const formatValueInput = (input) => {
 let STATE = { origins: [], boxes: [], balances: [], debts: [], currentMonth: new Date().getMonth()+1, currentYear: new Date().getFullYear(), selectedOriginFilter: 'all' };
 
 
-async function apiGet(path){ const res = await fetch(path); if(!res.ok) throw new Error(`GET ${path} failed: ${res.status}`); return res.json(); }
-async function apiPost(path, body){ return fetch(path, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(body) }); }
-async function apiPut(path, body){ return fetch(path, { method:'PUT', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(body) }); }
-async function apiDelete(path){ return fetch(path, { method:'DELETE' }); }
+const API_BASE = "https://controle-gastos-backend-9rox.onrender.com";
+
+async function apiGet(path){ 
+    const res = await fetch(`${API_BASE}${path}`);
+    if(!res.ok) throw new Error(`GET ${path} failed: ${res.status}`); 
+    return res.json(); 
+}
+
+async function apiPost(path, body){ 
+    return fetch(`${API_BASE}${path}`, { 
+        method:'POST', 
+        headers:{ 'Content-Type':'application/json' }, 
+        body: JSON.stringify(body) 
+    }); 
+}
+
+async function apiPut(path, body){ 
+    return fetch(`${API_BASE}${path}`, { 
+        method:'PUT', 
+        headers:{ 'Content-Type':'application/json' }, 
+        body: JSON.stringify(body) 
+    }); 
+}
+
+async function apiDelete(path){ 
+    return fetch(`${API_BASE}${path}`, { method:'DELETE' }); 
+}); }
 
 
 function showConfirmModal(message, callback) {
@@ -81,7 +104,7 @@ function showConfirmModal(message, callback) {
 
 async function loadAll(){
     try{
-        const [origins, boxes, dashboard] = await Promise.all([ apiGet('https://controle-gastos-backend-9rox.onrender.com/api/origens'), apiGet('https://controle-gastos-backend-9rox.onrender.com/api/caixas'), apiGet('https://controle-gastos-backend-9rox.onrender.com/api/dashboard') ]);
+        const [origins, boxes, dashboard] = await Promise.all([ apiGet('/api/origens'), apiGet('/api/caixas'), apiGet('/api/dashboard') ]);
         STATE.origins = origins; STATE.boxes = boxes; STATE.balances = dashboard.saldos || []; STATE.debts = dashboard.dividas || [];
         renderPrincipalPage(); renderOriginsTable(); renderBoxesTable(); populateFormSelects(); populateFilters();
     }catch(err){ console.error(err); alert('Erro ao carregar dados do backend. Verifique se o Flask está rodando.'); }
