@@ -81,7 +81,7 @@ function showConfirmModal(message, callback) {
 
 async function loadAll(){
     try{
-        const [origins, boxes, dashboard] = await Promise.all([ apiGet('https://controle-gastos-backend-9rox.onrender.com/api/origens'), apiGet('https://controle-gastos-backend-9rox.onrender.com/api/caixas'), apiGet('https://controle-gastos-backend-9rox.onrender.com  /api/dashboard') ]);
+        const [origins, boxes, dashboard] = await Promise.all([ apiGet('https://controle-gastos-backend-9rox.onrender.com/api/origens'), apiGet('https://controle-gastos-backend-9rox.onrender.com/api/caixas'), apiGet('https://controle-gastos-backend-9rox.onrender.com/api/dashboard') ]);
         STATE.origins = origins; STATE.boxes = boxes; STATE.balances = dashboard.saldos || []; STATE.debts = dashboard.dividas || [];
         renderPrincipalPage(); renderOriginsTable(); renderBoxesTable(); populateFormSelects(); populateFilters();
     }catch(err){ console.error(err); alert('Erro ao carregar dados do backend. Verifique se o Flask está rodando.'); }
