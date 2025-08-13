@@ -1,3 +1,30 @@
+const API_BASE = "https://controle-gastos-backend-9rox.onrender.com";
+
+async function apiGet(path){ 
+    const res = await fetch(`${API_BASE}${path}`);
+    if(!res.ok) throw new Error(`GET ${path} failed: ${res.status}`); 
+    return res.json(); 
+}
+async function apiPost(path, body){ 
+    return fetch(`${API_BASE}${path}`, { 
+        method:'POST', 
+        headers:{ 'Content-Type':'application/json' }, 
+        body: JSON.stringify(body) 
+    }); 
+}
+async function apiPut(path, body){ 
+    return fetch(`${API_BASE}${path}`, { 
+        method:'PUT', 
+        headers:{ 'Content-Type':'application/json' }, 
+        body: JSON.stringify(body) 
+    }); 
+}
+async function apiDelete(path){ 
+    return fetch(`${API_BASE}${path}`, { method:'DELETE' }); 
+}
+
+
+
 function showFeedback(message, elementId) {
     const feedbackEl = document.getElementById(elementId);
     if (feedbackEl) {
@@ -81,7 +108,7 @@ function showConfirmModal(message, callback) {
 
 async function loadAll(){
     try{
-        const [origins, boxes, dashboard] = await Promise.all([ apiGet('https://controle-gastos-backend-9rox.onrender.com/api/origens'), apiGet('https://controle-gastos-backend-9rox.onrender.com/api/caixas'), apiGet('https://controle-gastos-backend-9rox.onrender.com/api/dashboard') ]);
+        const [origins, boxes, dashboard] = await Promise.all([ apiGet('/api/origens'), apiGet('/api/caixas'), apiGet('/api/dashboard') ]);
         STATE.origins = origins; STATE.boxes = boxes; STATE.balances = dashboard.saldos || []; STATE.debts = dashboard.dividas || [];
         renderPrincipalPage(); renderOriginsTable(); renderBoxesTable(); populateFormSelects(); populateFilters();
     }catch(err){ console.error(err); alert('Erro ao carregar dados do backend. Verifique se o Flask está rodando.'); }
@@ -302,7 +329,7 @@ document.getElementById('origin-form-full').addEventListener('submit', async (e)
         await apiPut(`/api/origens/${id}`, data);
         message = 'Origem editada com sucesso!';
     }else{
-        await apiPost('https://controle-gastos-backend-9rox.onrender.com/api/origens', data);
+        await apiPost('/api/origens', data);
         message = 'Origem cadastrada com sucesso!';
     }
     
@@ -333,7 +360,7 @@ document.getElementById('box-form').addEventListener('submit', async (e)=>{
         await apiPut(`/api/caixas/${id}`, data);
         message = 'Caixa editada com sucesso!';
     }else{
-        await apiPost('https://controle-gastos-backend-9rox.onrender.com/api/caixas', data);
+        await apiPost('/api/caixas', data);
         message = 'Caixa cadastrada com sucesso!';
     }
     
@@ -367,7 +394,7 @@ document.addEventListener('click', async (e)=>{
 
 document.getElementById('balance-form').addEventListener('submit', async e=>{ e.preventDefault(); const id=document.getElementById('balance-id').value; const descricao=document.getElementById('balance-description').value; const caixa_id=document.getElementById('balance-box').value; const mes=parseInt(document.getElementById('balance-month').value); const ano=parseInt(document.getElementById('balance-year').value); const raw=document.getElementById('balance-value').value.replace(/\./g,'').replace(',','.'); const valor=parseFloat(raw);
 const payload={ descricao, caixa_id, mes, ano, valor };
-if(id){ await apiPut(`/api/saldos/${id}`, payload); } else { await apiPost('https://controle-gastos-backend-9rox.onrender.com/api/saldos', payload); }
+if(id){ await apiPut(`/api/saldos/${id}`, payload); } else { await apiPost('/api/saldos', payload); }
 document.getElementById('balance-form').reset(); document.getElementById('balance-id').value=''; await reloadDashboard(); });
 
 document.getElementById('balance-cancel-button').addEventListener('click', ()=>{ 
@@ -387,7 +414,7 @@ document.addEventListener('click', async (e)=>{ if(e.target.classList.contains('
 }});
 
 document.getElementById('debt-form').addEventListener('submit', async e=>{ e.preventDefault(); const id=document.getElementById('debt-id').value; const descricao=document.getElementById('debt-description').value; const caixa_id=document.getElementById('debt-origin').value; const mes=parseInt(document.getElementById('debt-month').value); const ano=parseInt(document.getElementById('debt-year').value); const raw=document.getElementById('debt-value').value.replace(/\./g,'').replace(',','.'); const valor=parseFloat(raw); const payload={ descricao, caixa_id, mes, ano, valor };
-if(id){ await apiPut(`/api/dividas/${id}`, payload); } else { await apiPost('https://controle-gastos-backend-9rox.onrender.com/api/dividas', payload); }
+if(id){ await apiPut(`/api/dividas/${id}`, payload); } else { await apiPost('/api/dividas', payload); }
 document.getElementById('debt-form').reset(); document.getElementById('debt-id').value=''; await reloadDashboard(); });
 
 document.getElementById('debt-cancel-button').addEventListener('click', ()=>{ 
@@ -409,10 +436,10 @@ if(e.target.classList.contains('delete-debt-btn')){
 
 });
 
-async function reloadDashboard(){ const dash = await apiGet('https://controle-gastos-backend-9rox.onrender.com/api/dashboard'); STATE.balances = dash.saldos || []; STATE.debts = dash.dividas || []; renderPrincipalPage(); }
-async function populateFormSelects(){ STATE.origins = await apiGet('https://controle-gastos-backend-9rox.onrender.com/api/origens'); STATE.boxes = await apiGet('https://controle-gastos-backend-9rox.onrender.com/api/caixas'); const balanceBox = document.getElementById('balance-box'); balanceBox.innerHTML='<option value="">Selecione um caixa</option>'; STATE.boxes.forEach(b=>{ const opt=document.createElement('option'); opt.value=b.id; opt.textContent=`${b.origem_descricao || ''}`; balanceBox.appendChild(opt); }); const debtOrigin = document.getElementById('debt-origin'); debtOrigin.innerHTML='<option value="">Selecione um caixa</option>'; STATE.boxes.forEach(b=>{ const opt=document.createElement('option'); opt.value=b.id; opt.textContent=`${b.descricao} (${b.origem_descricao || ''})`; debtOrigin.appendChild(opt); }); const boxOrigin = document.getElementById('box-origin'); boxOrigin.innerHTML='<option value="">Selecione uma origem</option>'; STATE.origins.forEach(o=>{ const opt=document.createElement('option'); opt.value=o.id; opt.textContent=o.descricao; boxOrigin.appendChild(opt); }); }
+async function reloadDashboard(){ const dash = await apiGet('/api/dashboard'); STATE.balances = dash.saldos || []; STATE.debts = dash.dividas || []; renderPrincipalPage(); }
+async function populateFormSelects(){ STATE.origins = await apiGet('/api/origens'); STATE.boxes = await apiGet('/api/caixas'); const balanceBox = document.getElementById('balance-box'); balanceBox.innerHTML='<option value="">Selecione um caixa</option>'; STATE.boxes.forEach(b=>{ const opt=document.createElement('option'); opt.value=b.id; opt.textContent=`${b.origem_descricao || ''}`; balanceBox.appendChild(opt); }); const debtOrigin = document.getElementById('debt-origin'); debtOrigin.innerHTML='<option value="">Selecione um caixa</option>'; STATE.boxes.forEach(b=>{ const opt=document.createElement('option'); opt.value=b.id; opt.textContent=`${b.descricao} (${b.origem_descricao || ''})`; debtOrigin.appendChild(opt); }); const boxOrigin = document.getElementById('box-origin'); boxOrigin.innerHTML='<option value="">Selecione uma origem</option>'; STATE.origins.forEach(o=>{ const opt=document.createElement('option'); opt.value=o.id; opt.textContent=o.descricao; boxOrigin.appendChild(opt); }); }
 
-async function reloadOriginsAndBoxes(){ STATE.origins = await apiGet('https://controle-gastos-backend-9rox.onrender.com/api/origens'); STATE.boxes = await apiGet('https://controle-gastos-backend-9rox.onrender.com/api/caixas'); renderOriginsTable(); renderBoxesTable(); populateFormSelects(); populateFilters(); }
+async function reloadOriginsAndBoxes(){ STATE.origins = await apiGet('/api/origens'); STATE.boxes = await apiGet('/api/caixas'); renderOriginsTable(); renderBoxesTable(); populateFormSelects(); populateFilters(); }
 
 const pageContents = document.querySelectorAll('.page-content'); const navLinks = document.querySelectorAll('.nav-link'); function showPage(id){ pageContents.forEach(p=>p.classList.remove('active')); const el=document.getElementById(id); if(el) el.classList.add('active'); navLinks.forEach(link=>{ link.classList.remove('bg-gray-700'); if(link.getAttribute('href').substring(1)===id) link.classList.add('bg-gray-700'); }); window.location.hash=id; }
 navLinks.forEach(link=> link.addEventListener('click',(e)=>{ e.preventDefault(); showPage(link.getAttribute('href').substring(1)); }));
@@ -508,5 +535,4 @@ document.addEventListener('DOMContentLoaded', () => {
     updateMenuButtons();
 
     // ... (O restante do seu código JavaScript, como os listeners de formulário)
-
 });
